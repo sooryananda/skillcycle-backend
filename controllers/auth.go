@@ -97,3 +97,53 @@ func Login(c *gin.Context) {
 		"user":    user,
 	})
 }
+
+func GetProfile(c *gin.Context) {
+	userID := c.MustGet("userID").(uint)
+
+	var user models.User
+	if err := config.DB.First(&user, userID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"user": user})
+}
+
+func UpdateProfile(c *gin.Context) {
+	userID := c.MustGet("userID").(uint)
+
+	var input struct {
+		Name          string `json:"name"`
+		Phone         string `json:"phone"`
+		SecondaryRole string `json:"secondary_role"`
+	}
+
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	var user models.User
+	if err := config.DB.First(&user, userID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		return
+	}
+
+	// Prevent setting secondary role same as primary role
+	if input.SecondaryRole != "" && input.SecondaryRole == user.Role {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Secondary role cannot be same as primary role"})
+		return
+	}
+
+	config.DB.Model(&user).Updates(map[string]interface{}{
+		"name":           input.Name,
+		"phone":          input.Phone,
+		"secondary_role": input.SecondaryRole,
+	})
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Profile updated successfully",
+		"user":    user,
+	})
+}
