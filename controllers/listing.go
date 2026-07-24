@@ -3,7 +3,6 @@ package controllers
 import (
 	"net/http"
 	"strconv"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sooryananda/skillcycle-backend/config"
@@ -21,7 +20,6 @@ func CreateListing(c *gin.Context) {
 		Condition   string  `json:"condition" binding:"required"`
 		ImageURL    string  `json:"image_url"`
 		Location    string  `json:"location"`
-		MarketDate  string  `json:"market_date"`
 	}
 
 	if err := c.ShouldBindJSON(&input); err != nil {
@@ -29,10 +27,8 @@ func CreateListing(c *gin.Context) {
 		return
 	}
 
-	marketDate, err := time.Parse("2006-01-02", input.MarketDate)
-	if err != nil {
-		marketDate = time.Now()
-	}
+	marketDate := config.GetNextSunday()
+	slotNumber := config.GenerateSlotNumber("item")
 
 	listing := models.Listing{
 		UserID:      userID,
@@ -42,8 +38,9 @@ func CreateListing(c *gin.Context) {
 		Category:    input.Category,
 		Condition:   input.Condition,
 		ImageURL:    input.ImageURL,
-		Location:    input.Location,
+		Location:    "Koramangala, Bangalore",
 		MarketDate:  marketDate,
+		SlotNumber:  slotNumber,
 		IsAvailable: true,
 	}
 

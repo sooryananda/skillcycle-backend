@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"github.com/sooryananda/skillcycle-backend/config"
+	"github.com/sooryananda/skillcycle-backend/controllers"
 	"github.com/sooryananda/skillcycle-backend/routes"
 )
 
@@ -36,6 +37,16 @@ func main() {
 	routes.AuthRoutes(r)
 
 	routes.ListingRoutes(r)
+	routes.SkillListingRoutes(r)
+	routes.RepairListingRoutes(r)
+	routes.MarketSlotRoutes(r)
+
+	routes.InterestRoutes(r)
+
+	// Demand pulse — proxies to Python AI service
+	r.GET("/api/demand", controllers.GetDemandPulse)
+
+	r.POST("/api/assess", controllers.GetAssessment)
 
 	port := os.Getenv("PORT")
 	log.Println("Server running on port", port)

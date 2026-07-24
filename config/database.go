@@ -28,7 +28,14 @@ func ConnectDatabase() {
 	}
 
 	// Auto create tables
-	database.AutoMigrate(&models.User{}, &models.Listing{})
+	database.AutoMigrate(
+		&models.User{},
+		&models.Listing{},
+		&models.SkillListing{},
+		&models.RepairListing{},
+		&models.MarketSlot{},
+		&models.Interest{},
+	)
 
 	log.Println("Database connected successfully!")
 	DB = database

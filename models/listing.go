@@ -17,4 +17,5 @@ type Listing struct {
 	MarketDate  time.Time `json:"market_date"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
+	SlotNumber  string    `json:"slot_number" gorm:"default:''"`
 }
