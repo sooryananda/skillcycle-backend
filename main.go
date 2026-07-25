@@ -48,6 +48,8 @@ func main() {
 
 	r.POST("/api/assess", controllers.GetAssessment)
 
+	r.POST("/api/search", controllers.SemanticSearch)
+
 	port := os.Getenv("PORT")
 	log.Println("Server running on port", port)
 	r.Run(":" + port)

@@ -64,3 +64,35 @@ func GetAssessment(c *gin.Context) {
 	json.Unmarshal(responseBody, &result)
 	c.JSON(http.StatusOK, result)
 }
+
+func SemanticSearch(c *gin.Context) {
+	var body map[string]interface{}
+	if err := c.ShouldBindJSON(&body); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+		return
+	}
+
+	jsonData, _ := json.Marshal(body)
+	resp, err := http.Post(
+		"http://localhost:5001/api/search",
+		"application/json",
+		bytes.NewBuffer(jsonData),
+	)
+	if err != nil {
+		c.JSON(http.StatusServiceUnavailable, gin.H{
+			"error": "Semantic search service is not available",
+		})
+		return
+	}
+	defer resp.Body.Close()
+
+	responseBody, err := io.ReadAll(resp.Body)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to read response"})
+		return
+	}
+
+	var result map[string]interface{}
+	json.Unmarshal(responseBody, &result)
+	c.JSON(http.StatusOK, result)
+}
